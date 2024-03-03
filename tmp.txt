@@ -1,0 +1,191 @@
+#pragma once
+
+#include <iostream>
+#include <optional>
+#include <type_traits>
+#include <variant>
+
+namespace fahangte::util {
+template <typename T, typename F> class Result;
+template <typename T, typename F> Result<T, F> Ok(T const &);
+template <typename T, typename F> Result<T, F> Err(F const &);
+template <typename T, typename F> Result<T, F> Ok(T &&);
+template <typename T, typename F> Result<T, F> Err(F &&);
+template <typename T, typename F>
+::std::ostream &operator<<(::std::ostream &, Result<T, F> const &);
+template <typename> struct OkType;
+template <typename> struct ErrType;
+
+template <typename T, typename F> struct OkType<Result<T, F>> {
+  using type = T;
+};
+
+template <typename T, typename F> struct ErrType<Result<T, F>> {
+  using type = F;
+};
+
+template <typename T, typename F> class Result {
+public:
+  friend Result<T, F> Ok<T, F>(T const &ok_val);
+  friend Result<T, F> Err<T, F>(F const &err_val);
+  friend Result<T, F> Ok<T, F>(T &&ok_val);
+  friend Result<T, F> Err<T, F>(F &&err_val);
+
+  bool is_ok() const;
+  bool is_err() const;
+  ::std::optional<T> ok() const;
+  ::std::optional<F> err() const;
+
+  template <typename U> Result<U, F> concat(Result<U, F> const &other);
+  Result<T, F> choice(Result<T, F> const &other);
+  template <typename Func>
+  auto concat_then(Func &&func) -> Result<
+      typename OkType<typename ::std::invoke_result<Func, T>::type>::type, F>;
+  template <typename Func>
+  auto choice_else(Func &&func) -> Result<
+      T, typename ErrType<typename ::std::invoke_result<Func, T>::type>::type>;
+
+  // is_ok_and
+  // is_err_and
+  // expect
+  // expect_err
+
+  template <typename Func>
+  auto map(Func &&func) const
+      -> Result<typename ::std::invoke_result<Func, T>::type, F>;
+
+  // the copy constructors
+  Result(Result const &result) : _value(result._value) {}
+  Result(Result &&result) noexcept : _value(::std::move(result._value)) {}
+
+  friend ::std::ostream &operator<<(::std::ostream &out,
+                                    Result<T, F> const &result);
+
+private:
+  ::std::variant<T, F> _value;
+  static int const _ok_index = 0;
+  static int const _err_index = 1;
+  struct _oktag {};
+  struct _errtag {};
+  Result(_oktag, T const &value)
+      : _value(::std::in_place_index<Result::_ok_index>, value) {}
+  Result(_errtag, F const &value)
+      : _value(::std::in_place_index<Result::_err_index>, value) {}
+  Result(_oktag, T &&value) noexcept
+      : _value(::std::in_place_index<Result::_ok_index>, ::std::move(value)) {}
+  Result(_errtag, F &&value) noexcept
+      : _value(::std::in_place_index<Result::_err_index>, ::std::move(value)) {}
+};
+
+template <typename T, typename F> Result<T, F> Ok(T const &ok_val) {
+  return Result(typename Result<T, F>::_oktag{}, ok_val);
+}
+
+template <typename T, typename F> Result<T, F> Err(F const &err_val) {
+  return Result<T, F>(typename Result<T, F>::_errtag{}, err_val);
+}
+
+template <typename T, typename F> Result<T, F> Ok(T &&ok_val) {
+  return Result<T, F>(typename Result<T, F>::_oktag{}, ok_val);
+}
+
+template <typename T, typename F> Result<T, F> Err(F &&err_val) {
+  return Result<T, F>(typename Result<T, F>::_errtag{}, err_val);
+}
+
+template <typename T, typename F> bool Result<T, F>::is_ok() const {
+  return this->_value.index() == _ok_index;
+}
+
+template <typename T, typename F> bool Result<T, F>::is_err() const {
+  return this->_value.index() == _err_index;
+}
+
+template <typename T, typename F>
+::std::optional<T> Result<T, F>::ok() const {
+  if (is_ok()) {
+    return ::std::get<Result::_ok_index>(_value);
+  } else {
+    return ::std::nullopt;
+  }
+}
+
+template <typename T, typename F>
+::std::optional<F> Result<T, F>::err() const {
+  if (is_err()) {
+    return ::std::get<Result::_err_index>(_value);
+  } else {
+    return ::std::nullopt;
+  }
+}
+
+template <typename T, typename F>
+::std::ostream &operator<<(::std::ostream &out, Result<T, F> const &result) {
+  if (result.is_ok()) {
+    out << "OK: ";
+    out << ::std::get<Result<T, F>::_ok_index>(result._value);
+  } else {
+    out << "Error: ";
+    out << ::std::get<Result<T, F>::_err_index>(result._value);
+  }
+  return out;
+};
+
+template <typename T, typename F>
+template <typename Func>
+auto Result<T, F>::map(Func &&func) const
+    -> Result<typename ::std::invoke_result<Func, T>::type, F> {
+  if (is_ok()) {
+    return Ok<typename ::std::invoke_result<Func, T>::type, F>(
+        func(ok().value()));
+  } else {
+    return Err<typename ::std::invoke_result<Func, T>::type, F>(err().value());
+  }
+}
+
+template <typename T, typename F>
+template <typename Func>
+auto Result<T, F>::concat_then(Func &&func) -> Result<
+    typename OkType<typename ::std::invoke_result<Func, T>::type>::type, F> {
+  if (is_ok()) {
+    return func(ok().value());
+  } else {
+    return Err<
+        typename OkType<typename ::std::invoke_result<Func, T>::type>::type, F>(
+        err().value());
+  }
+}
+
+template <typename T, typename F>
+template <typename Func>
+auto Result<T, F>::choice_else(Func &&func) -> Result<
+    T, typename ErrType<typename ::std::invoke_result<Func, T>::type>::type> {
+  if (is_ok()) {
+    return Ok<T, typename ErrType<
+                     typename ::std::invoke_result<Func, T>::type>::type>(
+        ok().value());
+  } else {
+    return func(err().value());
+  }
+}
+
+template <typename T, typename F>
+Result<T, F> Result<T, F>::choice(Result<T, F> const &other) {
+  if (is_err()) {
+    return other;
+  } else {
+    return *this;
+  }
+}
+
+template <typename T, typename F>
+template <typename U>
+Result<U, F> Result<T, F>::concat(Result<U, F> const &other) {
+  if (is_ok()) {
+    return other;
+  } else {
+    return Err<U, F>(::std::move(err().value()));
+  }
+}
+
+} // namespace fahangte::util
