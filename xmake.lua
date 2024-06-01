@@ -1,9 +1,10 @@
 set_project("fahangte")
 set_version(version)
-set_xmakever("2.8.6")
+set_xmakever("2.8.7")
 abbr_name="fat"
 version="0.0.1"
-add_rules("mode.debug") --"mode.release"
+add_rules("mode.debug","mode.release")
+add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
 set_languages("c++17")
 
 toolchain("clang4fahangte")
@@ -11,16 +12,13 @@ toolchain("clang4fahangte")
     set_toolset("ld", "clang++")
     add_includedirs("include")
 toolchain_end()
-
+header_dir="$(projectdir)/include/fahangte/"
 src_dir="$(projectdir)/src/"
-file_dir=src_dir.."file/"
-test_dir=src_dir.."test/"
-lex_dir=src_dir.."lex/"
 
 target("fat")
     set_kind("binary")
     set_filename(abbr_name.."v"..version)
-    add_deps("main")
+    add_deps("main","test")
 target_end()
 
 target("main")
@@ -28,44 +26,50 @@ target("main")
     add_files(src_dir.."main.cpp")
 target_end()
 
-target("file")
+target("test")
     set_kind("object")
-    add_files(file_dir.."**.cpp")
+    add_headerfiles(header_dir.."test.hpp")
+    add_files(src_dir.."test.cpp")
 target_end()
 
-target("lex")
-    set_kind("object")
-    add_files(lex_dir.."**.cpp")
-target_end()
+-- target("file")
+--     set_kind("object")
+--     add_files(file_dir.."**.cpp")
+-- target_end()
 
--- for testing
-target("test_result")
-    set_kind("binary")
-    set_filename("result")
-    add_files(test_dir.."test_result.cpp")
-target_end()
+-- target("lex")
+--     set_kind("object")
+--     add_files(lex_dir.."**.cpp")
+-- target_end()
 
-target("test_file")
-    set_kind("binary")
-    set_filename("file_reader")
-    add_files(test_dir.."test_filereader.cpp")
-    add_files(file_dir.."file.cpp")
-    set_runargs("/home/su/Documents/Code/fahangte/tmp/test.txt")
-target_end()
+-- -- for testing
+-- target("test_result")
+--     set_kind("binary")
+--     set_filename("result")
+--     add_files(test_dir.."test_result.cpp")
+-- target_end()
 
-target("test_lex")
-    set_kind("binary")
-    set_filename("lex")
-    add_files(test_dir.."test_lex.cpp")
-    add_deps("lex","file")
-    set_runargs("/home/su/Documents/Code/fahangte/tmp/test.txt")
-target_end()
+-- target("test_file")
+--     set_kind("binary")
+--     set_filename("file_reader")
+--     add_files(test_dir.."test_filereader.cpp")
+--     add_files(file_dir.."file.cpp")
+--     set_runargs("/home/su/Documents/Code/fahangte/tmp/test.txt")
+-- target_end()
 
-target("test_ast")
-    set_kind("binary")
-    set_filename("ast")
-    add_files(test_dir.."test_ast.cpp")
-target_end()
+-- target("test_lex")
+--     set_kind("binary")
+--     set_filename("lex")
+--     add_files(test_dir.."test_lex.cpp")
+--     add_deps("lex","file")
+--     set_runargs("/home/su/Documents/Code/fahangte/tmp/test.txt")
+-- target_end()
+
+-- target("test_ast")
+--     set_kind("binary")
+--     set_filename("ast")
+--     add_files(test_dir.."test_ast.cpp")
+-- target_end()
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
 --

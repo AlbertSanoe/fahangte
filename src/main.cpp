@@ -1,8 +1,8 @@
+#include <iostream>
+#include "fahangte/test.hpp"
 
-#include "fahangte/log.hpp"
 int main() {
-
-  
-  DEBUG("xxx");
-  return 0;
+  int x=func();
+  std::cout << x;
+  std::cout << "Hello World!\n";
 }
