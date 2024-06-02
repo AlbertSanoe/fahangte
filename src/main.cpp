@@ -3,6 +3,7 @@
 
 int main() {
   int x=func();
-  std::cout << x;
+  std::cout << sizeof(double);
   std::cout << "Hello World!"<<std::endl;
+
 }
