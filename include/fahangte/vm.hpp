@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm> /* fill */
-#include <cstdint> /* UINT16_MAX */
+#include <cstdint>   /* UINT16_MAX */
 
 class VirtualMachine;
 
@@ -57,11 +57,11 @@ public:
     DIV_MR = 23,
     DIV_MI = 24,
 
-    TEST_RR = 25,
-    TEST_RM = 26,
-    TEST_RI = 27,
-    TEST_MR = 28,
-    TEST_MI = 29,
+    CMP_RR = 25,
+    CMP_RM = 26,
+    CMP_RI = 27,
+    CMP_MR = 28,
+    CMP_MI = 29,
   };
 
   friend class VirtualMachine;
@@ -95,22 +95,27 @@ public:
   void two_operand_instruction();
 
 private:
-    void exeHALT();
-    void exeNOP();
-    void exeSTDIN(uint32_t*addr);
-    void exeSTDOUT(uint32_t num);
-    void exeJMP(uint32_t next);
-    void exeJE(uint32_t next);
-    void exeJNE();
-    void exeJLT();
-    void exeJLE();
-    void exeJGT();
-    void exeJGE();
-    void exeMOVRR();
+  void exeHALT();
+  void exeNOP();
+  void exeSTDIN();
+  void exeSTDOUT();
+  void exeJMP();
+  void exeJE();
+  void exeJNE();
+  void exeJLT();
+  void exeJLE();
+  void exeJGT();
+  void exeJGE();
+  void exeMOV();
+  void exeADD();
+  void exeSUB();
+  void exeMUL();
+  void exeDIV();
+  void exeREMINDER();
+  void exeCMP();
   static uint32_t memory[memory_addr_space];
   static InsturctionUnit text[instruction_addr_space];
   static uint32_t registers[register_number];
   uint32_t *ax, *bx, *cx, *dx, *ex, *fx, *gx, *pc;
   inline int which(InsturctionUnit i) { return (i.unit & (3 << 6)) >> 6; }
-  
 };
