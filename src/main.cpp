@@ -1,9 +1,12 @@
 #include <iostream>
 #include "fahangte/test.hpp"
 
+#include "fahangte/vm.hpp"
+
 int main() {
-  int x=func();
-  std::cout << sizeof(double);
-  std::cout << "Hello World!"<<std::endl;
+  VirtualMachine vm;
+
+  Instruction x(Instruction::InstructionType::ADDMI);
+  vm.test(x);
 
 }

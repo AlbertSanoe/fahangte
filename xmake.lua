@@ -18,7 +18,7 @@ src_dir="$(projectdir)/src/"
 target("fat")
     set_kind("binary")
     set_filename(abbr_name.."v"..version)
-    add_deps("main","test")
+    add_deps("main","vm")
 target_end()
 
 target("main")
@@ -26,10 +26,10 @@ target("main")
     add_files(src_dir.."main.cpp")
 target_end()
 
-target("test")
+target("vm")
     set_kind("object")
-    add_headerfiles(header_dir.."test.hpp")
-    add_files(src_dir.."test.cpp")
+    add_headerfiles(header_dir.."vm.hpp")
+    add_files(src_dir.."vm.cpp")
 target_end()
 
 -- target("file")

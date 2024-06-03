@@ -2,72 +2,191 @@
 
 #include <algorithm> /* fill */
 #include <cstdint>   /* UINT16_MAX */
+#include <unordered_map>
 
 class VirtualMachine;
 
-class InsturctionUnit {
+class Instruction {
 public:
-  InsturctionUnit(uint8_t i) : unit(i) {}
-  static const int non_operand_instruction_signal = 0;
-  static const int one_operand_instruction_signal = 1;
-  static const int two_operand_instruction_signal = 2;
-  enum class NonOperand : uint8_t {
-    NOP = 0,
-    HALT = 1,
+  static const uint8_t operand0 = 0;
+  static const uint8_t operand1 = 1;
+  static const uint8_t operand2 = 2;
+  static const uint8_t offsetOpType = 6;
+  static const uint8_t offset4bit = offsetOpType - 4;
+  static const uint8_t offset5bit = offsetOpType - 5;
+  enum class Type0 : uint8_t {
+    nop = 0,
+    halt = 1,
   };
-  enum class OneOperand : uint8_t {
-    STDIN = 0,
-    STDOUT = 1,
-    JMP = 2,
-    JE = 3,
-    JNE = 4,
-    JLT = 5,
-    JLE = 6,
-    JGT = 7,
-    JGE = 8,
+  enum class Type1 : uint8_t {
+    stdin = 0,
+    stdout = 1,
+    jmp = 2,
+    je = 3,
+    jne = 4,
+    jlt = 5,
+    jle = 6,
+    jgt = 7,
+    jge = 8,
   };
-  enum class TwoOperand : uint8_t {
-    MOV_RR = 0,
-    MOV_RM = 1,
-    MOV_RI = 2,
-    MOV_MR = 3,
-    MOV_MI = 4,
+  enum class Type1Param : uint8_t {
+    Reg = 0,
+    Mem = 1,
+    Imme = 2,
+  };
+  enum class Type2 : uint8_t {
+    movrr = 0,
+    movrm = 1,
+    movri = 2,
+    movmr = 3,
+    movmi = 4,
 
-    ADD_RR = 5,
-    ADD_RM = 6,
-    ADD_RI = 7,
-    ADD_MR = 8,
-    ADD_MI = 9,
+    addrr = 5,
+    addrm = 6,
+    addri = 7,
+    addmr = 8,
+    addmi = 9,
 
-    SUB_RR = 10,
-    SUB_RM = 11,
-    SUB_RI = 12,
-    SUB_MR = 13,
-    SUB_MI = 14,
+    subrr = 10,
+    subrm = 11,
+    subri = 12,
+    submr = 13,
+    submi = 14,
 
-    MUL_RR = 15,
-    MUL_RM = 16,
-    MUL_RI = 17,
-    MUL_MR = 18,
-    MUL_MI = 19,
+    mulrr = 15,
+    mulrm = 16,
+    mulri = 17,
+    mulmr = 18,
+    mulmi = 19,
 
-    DIV_RR = 20,
-    DIV_RM = 21,
-    DIV_RI = 22,
-    DIV_MR = 23,
-    DIV_MI = 24,
+    divrr = 20,
+    divrm = 21,
+    divri = 22,
+    divmr = 23,
+    divmi = 24,
 
-    CMP_RR = 25,
-    CMP_RM = 26,
-    CMP_RI = 27,
-    CMP_MR = 28,
-    CMP_MI = 29,
+    cmprr = 25,
+    cmprm = 26,
+    cmpri = 27,
+    cmpmr = 28,
+    cmpmi = 29,
+  };
+
+  enum class InstructionType : uint8_t {
+    NOP = operand0 << offsetOpType | uint8_t(Type0::nop) << offset4bit,
+    HALT = operand0 << offsetOpType | uint8_t(Type0::halt) << offset4bit,
+
+    STDINR = operand1 << offsetOpType | uint8_t(Type1::stdin) << offset4bit |
+             uint8_t(Type1Param::Reg),
+    STDINM = operand1 << offsetOpType | uint8_t(Type1::stdin) << offset4bit |
+             uint8_t(Type1Param::Mem),
+
+    STDOUTR = operand1 << offsetOpType | uint8_t(Type1::stdout) << offset4bit |
+              uint8_t(Type1Param::Reg),
+    STDOUTM = operand1 << offsetOpType | uint8_t(Type1::stdout) << offset4bit |
+              uint8_t(Type1Param::Mem),
+    STDOUTI = operand1 << offsetOpType | uint8_t(Type1::stdout) << offset4bit |
+              uint8_t(Type1Param::Imme),
+
+    JMPR = operand1 << offsetOpType | uint8_t(Type1::jmp) << offset4bit |
+           uint8_t(Type1Param::Reg),
+    JMPM = operand1 << offsetOpType | uint8_t(Type1::jmp) << offset4bit |
+           uint8_t(Type1Param::Mem),
+    JMPI = operand1 << offsetOpType | uint8_t(Type1::jmp) << offset4bit |
+           uint8_t(Type1Param::Imme),
+
+    JER = operand1 << offsetOpType | uint8_t(Type1::je) << offset4bit |
+          uint8_t(Type1Param::Reg),
+    JEM = operand1 << offsetOpType | uint8_t(Type1::je) << offset4bit |
+          uint8_t(Type1Param::Mem),
+    JEI = operand1 << offsetOpType | uint8_t(Type1::je) << offset4bit |
+          uint8_t(Type1Param::Imme),
+
+    JNER = operand1 << offsetOpType | uint8_t(Type1::jne) << offset4bit |
+           uint8_t(Type1Param::Reg),
+    JNEM = operand1 << offsetOpType | uint8_t(Type1::jne) << offset4bit |
+           uint8_t(Type1Param::Mem),
+    JNEI = operand1 << offsetOpType | uint8_t(Type1::jne) << offset4bit |
+           uint8_t(Type1Param::Imme),
+
+    JLTR = operand1 << offsetOpType | uint8_t(Type1::jlt) << offset4bit |
+           uint8_t(Type1Param::Reg),
+    JLTM = operand1 << offsetOpType | uint8_t(Type1::jlt) << offset4bit |
+           uint8_t(Type1Param::Mem),
+    JLTI = operand1 << offsetOpType | uint8_t(Type1::jlt) << offset4bit |
+           uint8_t(Type1Param::Imme),
+
+    JLER = operand1 << offsetOpType | uint8_t(Type1::jle) << offset4bit |
+           uint8_t(Type1Param::Reg),
+    JLEM = operand1 << offsetOpType | uint8_t(Type1::jle) << offset4bit |
+           uint8_t(Type1Param::Mem),
+    JLEI = operand1 << offsetOpType | uint8_t(Type1::jle) << offset4bit |
+           uint8_t(Type1Param::Imme),
+
+    JGTR = operand1 << offsetOpType | uint8_t(Type1::jgt) << offset4bit |
+           uint8_t(Type1Param::Reg),
+    JGTM = operand1 << offsetOpType | uint8_t(Type1::jgt) << offset4bit |
+           uint8_t(Type1Param::Mem),
+    JGTI = operand1 << offsetOpType | uint8_t(Type1::jgt) << offset4bit |
+           uint8_t(Type1Param::Imme),
+
+    JGER = operand1 << offsetOpType | uint8_t(Type1::jge) << offset4bit |
+           uint8_t(Type1Param::Reg),
+    JGEM = operand1 << offsetOpType | uint8_t(Type1::jge) << offset4bit |
+           uint8_t(Type1Param::Mem),
+    JGEI = operand1 << offsetOpType | uint8_t(Type1::jge) << offset4bit |
+           uint8_t(Type1Param::Imme),
+
+    MOVRR = operand2 << offsetOpType | uint8_t(Type2::movrr) << offset5bit,
+    MOVRM = operand2 << offsetOpType | uint8_t(Type2::movrm) << offset5bit,
+    MOVRI = operand2 << offsetOpType | uint8_t(Type2::movri) << offset5bit,
+    MOVMR = operand2 << offsetOpType | uint8_t(Type2::movmr) << offset5bit,
+    MOVMI = operand2 << offsetOpType | uint8_t(Type2::movmi) << offset5bit,
+
+    ADDRR = operand2 << offsetOpType | uint8_t(Type2::addrr) << offset5bit,
+    ADDRM = operand2 << offsetOpType | uint8_t(Type2::addrm) << offset5bit,
+    ADDRI = operand2 << offsetOpType | uint8_t(Type2::addri) << offset5bit,
+    ADDMR = operand2 << offsetOpType | uint8_t(Type2::addmr) << offset5bit,
+    ADDMI = operand2 << offsetOpType | uint8_t(Type2::addmi) << offset5bit,
+
+    SUBRR = operand2 << offsetOpType | uint8_t(Type2::subrr) << offset5bit,
+    SUBRM = operand2 << offsetOpType | uint8_t(Type2::subrm) << offset5bit,
+    SUBRI = operand2 << offsetOpType | uint8_t(Type2::subri) << offset5bit,
+    SUBMR = operand2 << offsetOpType | uint8_t(Type2::submr) << offset5bit,
+    SUBMI = operand2 << offsetOpType | uint8_t(Type2::submi) << offset5bit,
+
+    MULRR = operand2 << offsetOpType | uint8_t(Type2::mulrr) << offset5bit,
+    MULRM = operand2 << offsetOpType | uint8_t(Type2::mulrm) << offset5bit,
+    MULRI = operand2 << offsetOpType | uint8_t(Type2::mulri) << offset5bit,
+    MULMR = operand2 << offsetOpType | uint8_t(Type2::mulmr) << offset5bit,
+    MULMI = operand2 << offsetOpType | uint8_t(Type2::mulmi) << offset5bit,
+
+    DIVRR = operand2 << offsetOpType | uint8_t(Type2::divrr) << offset5bit,
+    DIVRM = operand2 << offsetOpType | uint8_t(Type2::divrm) << offset5bit,
+    DIVRI = operand2 << offsetOpType | uint8_t(Type2::divri) << offset5bit,
+    DIVMR = operand2 << offsetOpType | uint8_t(Type2::divmr) << offset5bit,
+    DIVMI = operand2 << offsetOpType | uint8_t(Type2::divmi) << offset5bit,
+
+    MODRR = operand2 << offsetOpType | uint8_t(Type2::divrr) << offset5bit | 1,
+    MODRM = operand2 << offsetOpType | uint8_t(Type2::divrm) << offset5bit | 1,
+    MODRI = operand2 << offsetOpType | uint8_t(Type2::divri) << offset5bit | 1,
+    MODMR = operand2 << offsetOpType | uint8_t(Type2::divmr) << offset5bit | 1,
+    MODMI = operand2 << offsetOpType | uint8_t(Type2::divmi) << offset5bit | 1,
+
+    CMPRR = operand2 << offsetOpType | uint8_t(Type2::cmprr) << offset5bit,
+    CMPRM = operand2 << offsetOpType | uint8_t(Type2::cmprm) << offset5bit,
+    CMPRI = operand2 << offsetOpType | uint8_t(Type2::cmpri) << offset5bit,
+    CMPMR = operand2 << offsetOpType | uint8_t(Type2::cmpmr) << offset5bit,
+    CMPMI = operand2 << offsetOpType | uint8_t(Type2::cmpmi) << offset5bit,
   };
 
   friend class VirtualMachine;
 
-private:
-  const uint8_t unit;
+  // private:
+public:
+  uint8_t unit;
+  Instruction(InstructionType i) : unit(uint8_t(i)) {}
+  Instruction(uint8_t data) : unit(data) {}
 };
 
 class VirtualMachine {
@@ -76,9 +195,16 @@ public:
   static const uint32_t memory_addr_space = UINT16_MAX + 1;
   static const int register_number = 8;
 
+private:
+  uint32_t memory[memory_addr_space];
+  // Instruction text[instruction_addr_space];
+  uint32_t registers[register_number];
+  uint32_t *ax, *bx, *cx, *dx, *ex, *fx, *gx, *pc;
+
+public:
   VirtualMachine() {
     std::fill(memory, memory + memory_addr_space, 0);
-    std::fill(text, text + instruction_addr_space, 0);
+    // std::fill(text, text + instruction_addr_space, 0);
     std::fill(registers, registers + register_number, 0);
     ax = &registers[0];
     bx = &registers[1];
@@ -90,6 +216,14 @@ public:
     pc = &registers[7];
   }
 
+  void test(Instruction t) {
+    auto it = VirtualMachine::table.find((Instruction::InstructionType)t.unit);
+    if (it != table.end()) {
+      (this->*(it->second))();
+    } else {
+    }
+  }
+
   void non_operand_instruction();
   void one_operand_instruction();
   void two_operand_instruction();
@@ -97,25 +231,156 @@ public:
 private:
   void exeHALT();
   void exeNOP();
-  void exeSTDIN();
-  void exeSTDOUT();
-  void exeJMP();
-  void exeJE();
-  void exeJNE();
-  void exeJLT();
-  void exeJLE();
-  void exeJGT();
-  void exeJGE();
-  void exeMOV();
-  void exeADD();
-  void exeSUB();
-  void exeMUL();
-  void exeDIV();
-  void exeREMINDER();
-  void exeCMP();
-  static uint32_t memory[memory_addr_space];
-  static InsturctionUnit text[instruction_addr_space];
-  static uint32_t registers[register_number];
-  uint32_t *ax, *bx, *cx, *dx, *ex, *fx, *gx, *pc;
-  inline int which(InsturctionUnit i) { return (i.unit & (3 << 6)) >> 6; }
+  void exeSTDINR();
+  void exeSTDINM();
+  void exeSTDOUTR();
+  void exeSTDOUTM();
+  void exeSTDOUTI();
+  void exeJMPR();
+  void exeJMPM();
+  void exeJMPI();
+  void exeJER();
+  void exeJEM();
+  void exeJEI();
+  void exeJNER();
+  void exeJNEM();
+  void exeJNEI();
+  void exeJLTR();
+  void exeJLTM();
+  void exeJLTI();
+  void exeJLER();
+  void exeJLEM();
+  void exeJLEI();
+  void exeJGTR();
+  void exeJGTM();
+  void exeJGTI();
+  void exeJGER();
+  void exeJGEM();
+  void exeJGEI();
+
+  void exeMOVRR();
+  void exeMOVRM();
+  void exeMOVRI();
+  void exeMOVMR();
+  void exeMOVMI();
+
+  void exeADDRR();
+  void exeADDRM();
+  void exeADDRI();
+  void exeADDMR();
+  void exeADDMI();
+
+  void exeSUBRR();
+  void exeSUBRM();
+  void exeSUBRI();
+  void exeSUBMR();
+  void exeSUBMI();
+
+  void exeMULRR();
+  void exeMULRM();
+  void exeMULRI();
+  void exeMULMR();
+  void exeMULMI();
+
+  void exeDIVRR();
+  void exeDIVRM();
+  void exeDIVRI();
+  void exeDIVMR();
+  void exeDIVMI();
+
+  void exeMODRR();
+  void exeMODRM();
+  void exeMODRI();
+  void exeMODMR();
+  void exeMODMI();
+
+  void exeCMPRR();
+  void exeCMPRM();
+  void exeCMPRI();
+  void exeCMPMR();
+  void exeCMPMI();
+
+  static inline const std::unordered_map<Instruction::InstructionType,
+                                         void (VirtualMachine::*)()>
+      table = {
+          {Instruction::InstructionType::HALT, &VirtualMachine::exeHALT},
+          {Instruction::InstructionType::NOP, &VirtualMachine::exeNOP},
+
+          {Instruction::InstructionType::STDINR, &VirtualMachine::exeSTDINR},
+          {Instruction::InstructionType::STDINM, &VirtualMachine::exeSTDINM},
+
+          {Instruction::InstructionType::STDOUTR, &VirtualMachine::exeSTDOUTR},
+          {Instruction::InstructionType::STDOUTM, &VirtualMachine::exeSTDOUTM},
+          {Instruction::InstructionType::STDOUTI, &VirtualMachine::exeSTDOUTI},
+
+          {Instruction::InstructionType::JMPR, &VirtualMachine::exeJMPR},
+          {Instruction::InstructionType::JMPM, &VirtualMachine::exeJMPM},
+          {Instruction::InstructionType::JMPI, &VirtualMachine::exeJMPI},
+
+          {Instruction::InstructionType::JER, &VirtualMachine::exeJER},
+          {Instruction::InstructionType::JEM, &VirtualMachine::exeJEM},
+          {Instruction::InstructionType::JEI, &VirtualMachine::exeJEI},
+
+          {Instruction::InstructionType::JNER, &VirtualMachine::exeJNER},
+          {Instruction::InstructionType::JNEM, &VirtualMachine::exeJNEM},
+          {Instruction::InstructionType::JNEI, &VirtualMachine::exeJNEI},
+
+          {Instruction::InstructionType::JLTR, &VirtualMachine::exeJLTR},
+          {Instruction::InstructionType::JLTM, &VirtualMachine::exeJLTM},
+          {Instruction::InstructionType::JLTI, &VirtualMachine::exeJLTI},
+
+          {Instruction::InstructionType::JLER, &VirtualMachine::exeJLER},
+          {Instruction::InstructionType::JLEM, &VirtualMachine::exeJLEM},
+          {Instruction::InstructionType::JLEI, &VirtualMachine::exeJLEI},
+
+          {Instruction::InstructionType::JGTR, &VirtualMachine::exeJGTR},
+          {Instruction::InstructionType::JGTM, &VirtualMachine::exeJGTM},
+          {Instruction::InstructionType::JGTI, &VirtualMachine::exeJGTI},
+
+          {Instruction::InstructionType::JGER, &VirtualMachine::exeJGER},
+          {Instruction::InstructionType::JGEM, &VirtualMachine::exeJGEM},
+          {Instruction::InstructionType::JGEI, &VirtualMachine::exeJGEI},
+
+          {Instruction::InstructionType::MOVRR, &VirtualMachine::exeMOVRR},
+          {Instruction::InstructionType::MOVRM, &VirtualMachine::exeMOVRM},
+          {Instruction::InstructionType::MOVRI, &VirtualMachine::exeMOVRI},
+          {Instruction::InstructionType::MOVMR, &VirtualMachine::exeMOVMR},
+          {Instruction::InstructionType::MOVMI, &VirtualMachine::exeMOVMI},
+
+          {Instruction::InstructionType::ADDRR, &VirtualMachine::exeADDRR},
+          {Instruction::InstructionType::ADDRM, &VirtualMachine::exeADDRM},
+          {Instruction::InstructionType::ADDRI, &VirtualMachine::exeADDRI},
+          {Instruction::InstructionType::ADDMR, &VirtualMachine::exeADDMR},
+          {Instruction::InstructionType::ADDMI, &VirtualMachine::exeADDMI},
+
+          {Instruction::InstructionType::SUBRR, &VirtualMachine::exeSUBRR},
+          {Instruction::InstructionType::SUBRM, &VirtualMachine::exeSUBRM},
+          {Instruction::InstructionType::SUBRI, &VirtualMachine::exeSUBRI},
+          {Instruction::InstructionType::SUBMR, &VirtualMachine::exeSUBMR},
+          {Instruction::InstructionType::SUBMI, &VirtualMachine::exeSUBMI},
+
+          {Instruction::InstructionType::MULRR, &VirtualMachine::exeMULRR},
+          {Instruction::InstructionType::MULRM, &VirtualMachine::exeMULRM},
+          {Instruction::InstructionType::MULRI, &VirtualMachine::exeMULRI},
+          {Instruction::InstructionType::MULMR, &VirtualMachine::exeMULMR},
+          {Instruction::InstructionType::MULMI, &VirtualMachine::exeMULMI},
+
+          {Instruction::InstructionType::DIVRR, &VirtualMachine::exeDIVRR},
+          {Instruction::InstructionType::DIVRM, &VirtualMachine::exeDIVRM},
+          {Instruction::InstructionType::DIVRI, &VirtualMachine::exeDIVRI},
+          {Instruction::InstructionType::DIVMR, &VirtualMachine::exeDIVMR},
+          {Instruction::InstructionType::DIVMI, &VirtualMachine::exeDIVMI},
+
+          {Instruction::InstructionType::MODRR, &VirtualMachine::exeMODRR},
+          {Instruction::InstructionType::MODRM, &VirtualMachine::exeMODRM},
+          {Instruction::InstructionType::MODRI, &VirtualMachine::exeMODRI},
+          {Instruction::InstructionType::MODMR, &VirtualMachine::exeMODMR},
+          {Instruction::InstructionType::MODMI, &VirtualMachine::exeMODMI},
+
+          {Instruction::InstructionType::CMPRR, &VirtualMachine::exeCMPRR},
+          {Instruction::InstructionType::CMPRM, &VirtualMachine::exeCMPRM},
+          {Instruction::InstructionType::CMPRI, &VirtualMachine::exeCMPRI},
+          {Instruction::InstructionType::CMPMR, &VirtualMachine::exeCMPMR},
+          {Instruction::InstructionType::CMPMI, &VirtualMachine::exeCMPMI},
+  };
 };
