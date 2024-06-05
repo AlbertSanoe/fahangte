@@ -1,19 +1,21 @@
 #pragma once
 
 #include <algorithm> /* fill */
-#include <cstdint>   /* UINT16_MAX */
+#include <cstddef>
+#include <cstdint> /* UINT16_MAX */
 #include <unordered_map>
 
 class VirtualMachine;
 
 class Instruction {
-public:
+private:
   static const uint8_t operand0 = 0;
   static const uint8_t operand1 = 1;
   static const uint8_t operand2 = 2;
   static const uint8_t offsetOpType = 6;
   static const uint8_t offset4bit = offsetOpType - 4;
   static const uint8_t offset5bit = offsetOpType - 5;
+
   enum class Type0 : uint8_t {
     nop = 0,
     halt = 1,
@@ -72,6 +74,7 @@ public:
     cmpmi = 29,
   };
 
+public:
   enum class InstructionType : uint8_t {
     NOP = operand0 << offsetOpType | uint8_t(Type0::nop) << offset4bit,
     HALT = operand0 << offsetOpType | uint8_t(Type0::halt) << offset4bit,
@@ -187,24 +190,32 @@ public:
   uint8_t unit;
   Instruction(InstructionType i) : unit(uint8_t(i)) {}
   Instruction(uint8_t data) : unit(data) {}
+  Instruction() {}
 };
 
 class VirtualMachine {
 public:
-  static const uint32_t instruction_addr_space = UINT16_MAX + 1;
-  static const uint32_t memory_addr_space = UINT16_MAX + 1;
-  static const int register_number = 8;
+  using ImmeType = uint32_t;
+  using AddrIndexType = uint16_t;
+  using RegIndexType = uint8_t;
+  static const std::size_t instruction_addr_space = 1 << 16;
+  static const std::size_t memory_addr_space = 1 << 16;
+  static const RegIndexType register_number = 8;
 
-private:
-  uint32_t memory[memory_addr_space];
-  // Instruction text[instruction_addr_space];
-  uint32_t registers[register_number];
-  uint32_t *ax, *bx, *cx, *dx, *ex, *fx, *gx, *pc;
+  // private:
+public:
+  // Assuming a 32-bit memory address space with a total of 2^16 addresses.
+  ImmeType memory[memory_addr_space];
+  // .section .text 32-bit address space with a total of 2^16 addresses
+  Instruction text[instruction_addr_space];
+
+  ImmeType registers[register_number];
+  ImmeType *ax, *bx, *cx, *dx, *ex, *fx, *gx, *PC;
 
 public:
   VirtualMachine() {
     std::fill(memory, memory + memory_addr_space, 0);
-    // std::fill(text, text + instruction_addr_space, 0);
+    std::fill(text, text + instruction_addr_space, 0);
     std::fill(registers, registers + register_number, 0);
     ax = &registers[0];
     bx = &registers[1];
@@ -213,10 +224,13 @@ public:
     ex = &registers[4];
     fx = &registers[5];
     gx = &registers[6];
-    pc = &registers[7];
+    PC = &registers[7];
   }
 
+  void loadPC(uint32_t *ptr) { this->PC = ptr; }
+
   void test(Instruction t) {
+
     auto it = VirtualMachine::table.find((Instruction::InstructionType)t.unit);
     if (it != table.end()) {
       (this->*(it->second))();
@@ -228,7 +242,18 @@ public:
   void one_operand_instruction();
   void two_operand_instruction();
 
-private:
+  // private:
+public:
+  template <typename DataType>
+  void convert(DataType &val, std::size_t offset = 0);
+  template <typename DataType1, typename DataType2>
+  void convert2(DataType1 &val1, DataType2 &val2);
+
+  template <typename ...DataTypes> void movePC();
+
+  // Template specialization for different types
+  template <typename ConvertType> struct Pace;
+
   void exeHALT();
   void exeNOP();
   void exeSTDINR();
