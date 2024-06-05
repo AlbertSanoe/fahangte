@@ -2,10 +2,6 @@
 #include <cstddef>
 #include <iostream>
 
-static const unsigned reg_pace = 1;
-static const unsigned mem_pace = 4;
-static const unsigned imme_pace = 4;
-
 template <> struct VirtualMachine::Pace<VirtualMachine::RegIndexType> {
   static constexpr std::size_t pace = 1;
 };
@@ -82,40 +78,201 @@ void VirtualMachine::exeSTDOUTI() {
 }
 
 void VirtualMachine::exeJMPR() {
-  RegIndexType jmp_addr;
-  this->convert(jmp_addr);
-  this->movePC(jmp_addr);
+  RegIndexType index;
+  this->convert(index);
+  this->movePC(this->registers[index]);
 }
 void VirtualMachine::exeJMPM() {
-  AddrIndexType jmp_addr;
-  this->convert(jmp_addr);
-  this->movePC(jmp_addr);
+  AddrIndexType mem_addr;
+  this->convert(mem_addr); // check
+  this->movePC(this->memory[mem_addr]);
 }
 
 void VirtualMachine::exeJMPI() {
-  ImmeType jmp_addr;
-  this->convert(jmp_addr);
-  this->movePC(jmp_addr);
+  ImmeType abs_addr;
+  this->convert(abs_addr);
+  this->movePC(abs_addr);
 }
 
-void VirtualMachine::exeJER() { std::cout << "exeJER" << std::endl; }
-void VirtualMachine::exeJEM() { std::cout << "exeJEM" << std::endl; }
-void VirtualMachine::exeJEI() { std::cout << "exeJEI" << std::endl; }
-void VirtualMachine::exeJNER() { std::cout << "exeJNER" << std::endl; }
-void VirtualMachine::exeJNEM() { std::cout << "exeJNEM" << std::endl; }
-void VirtualMachine::exeJNEI() { std::cout << "exeJNEI" << std::endl; }
-void VirtualMachine::exeJLTR() { std::cout << "exeJLTR" << std::endl; }
-void VirtualMachine::exeJLTM() { std::cout << "exeJLTM" << std::endl; }
-void VirtualMachine::exeJLTI() { std::cout << "exeJLTI" << std::endl; }
-void VirtualMachine::exeJLER() { std::cout << "exeJLER" << std::endl; }
-void VirtualMachine::exeJLEM() { std::cout << "exeJLEM" << std::endl; }
-void VirtualMachine::exeJLEI() { std::cout << "exeJLEI" << std::endl; }
-void VirtualMachine::exeJGTR() { std::cout << "exeJGTR" << std::endl; }
-void VirtualMachine::exeJGTM() { std::cout << "exeJGTM" << std::endl; }
-void VirtualMachine::exeJGTI() { std::cout << "exeJGTI" << std::endl; }
-void VirtualMachine::exeJGER() { std::cout << "exeJGER" << std::endl; }
-void VirtualMachine::exeJGEM() { std::cout << "exeJGEM" << std::endl; }
-void VirtualMachine::exeJGEI() { std::cout << "exeJGEI" << std::endl; }
+void VirtualMachine::exeJER() {
+  if (*this->ex == 0) {
+    RegIndexType index;
+    this->convert(index);
+    this->movePC(this->registers[index]);
+  } else {
+    this->incPC<RegIndexType>();
+  }
+}
+
+void VirtualMachine::exeJEM() {
+  if (*this->ex == 0) {
+    AddrIndexType mem_addr;
+    this->convert(mem_addr); // check
+    this->movePC(this->memory[mem_addr]);
+  } else {
+    this->incPC<AddrIndexType>();
+  }
+}
+
+void VirtualMachine::exeJEI() {
+  if (*this->ex == 0) {
+    ImmeType abs_addr;
+    this->convert(abs_addr);
+    this->movePC(abs_addr);
+  } else {
+    this->incPC<ImmeType>();
+  }
+}
+
+void VirtualMachine::exeJNER() {
+  if (*this->ex != 0) {
+    RegIndexType index;
+    this->convert(index);
+    this->movePC(this->registers[index]);
+  } else {
+    this->incPC<RegIndexType>();
+  }
+}
+
+void VirtualMachine::exeJNEM() {
+  if (*this->ex != 0) {
+    AddrIndexType mem_addr;
+    this->convert(mem_addr); // check
+    this->movePC(this->memory[mem_addr]);
+  } else {
+    this->incPC<AddrIndexType>();
+  }
+}
+
+void VirtualMachine::exeJNEI() {
+  if (*this->ex != 0) {
+    ImmeType abs_addr;
+    this->convert(abs_addr);
+    this->movePC(abs_addr);
+  } else {
+    this->incPC<ImmeType>();
+  }
+}
+
+void VirtualMachine::exeJLTR() {
+  if (*this->ex < 0) {
+    RegIndexType index;
+    this->convert(index);
+    this->movePC(this->registers[index]);
+  } else {
+    this->incPC<RegIndexType>();
+  }
+}
+
+void VirtualMachine::exeJLTM() {
+  if (*this->ex < 0) {
+    AddrIndexType mem_addr;
+    this->convert(mem_addr); // check
+    this->movePC(this->memory[mem_addr]);
+  } else {
+    this->incPC<AddrIndexType>();
+  }
+}
+
+void VirtualMachine::exeJLTI() {
+  if (*this->ex < 0) {
+    ImmeType abs_addr;
+    this->convert(abs_addr);
+    this->movePC(abs_addr);
+  } else {
+    this->incPC<ImmeType>();
+  }
+}
+
+void VirtualMachine::exeJLER() {
+  if (*this->ex <= 0) {
+    RegIndexType index;
+    this->convert(index);
+    this->movePC(this->registers[index]);
+  } else {
+    this->incPC<RegIndexType>();
+  }
+}
+
+void VirtualMachine::exeJLEM() {
+  if (*this->ex <= 0) {
+    AddrIndexType mem_addr;
+    this->convert(mem_addr); // check
+    this->movePC(this->memory[mem_addr]);
+  } else {
+    this->incPC<AddrIndexType>();
+  }
+}
+
+void VirtualMachine::exeJLEI() {
+  if (*this->ex <= 0) {
+    ImmeType abs_addr;
+    this->convert(abs_addr);
+    this->movePC(abs_addr);
+  } else {
+    this->incPC<ImmeType>();
+  }
+}
+
+void VirtualMachine::exeJGTR() {
+  if (*this->ex > 0) {
+    RegIndexType index;
+    this->convert(index);
+    this->movePC(this->registers[index]);
+  } else {
+    this->incPC<RegIndexType>();
+  }
+}
+
+void VirtualMachine::exeJGTM() {
+  if (*this->ex > 0) {
+    AddrIndexType mem_addr;
+    this->convert(mem_addr); // check
+    this->movePC(this->memory[mem_addr]);
+  } else {
+    this->incPC<AddrIndexType>();
+  }
+}
+
+void VirtualMachine::exeJGTI() {
+  if (*this->ex > 0) {
+    ImmeType abs_addr;
+    this->convert(abs_addr);
+    this->movePC(abs_addr);
+  } else {
+    this->incPC<ImmeType>();
+  }
+}
+
+void VirtualMachine::exeJGER() {
+  if (*this->ex >= 0) {
+    RegIndexType index;
+    this->convert(index);
+    this->movePC(this->registers[index]);
+  } else {
+    this->incPC<RegIndexType>();
+  }
+}
+
+void VirtualMachine::exeJGEM() {
+  if (*this->ex >= 0) {
+    AddrIndexType mem_addr;
+    this->convert(mem_addr); // check
+    this->movePC(this->memory[mem_addr]);
+  } else {
+    this->incPC<AddrIndexType>();
+  }
+}
+
+void VirtualMachine::exeJGEI() {
+  if (*this->ex >= 0) {
+    ImmeType abs_addr;
+    this->convert(abs_addr);
+    this->movePC(abs_addr);
+  } else {
+    this->incPC<ImmeType>();
+  }
+}
 
 void VirtualMachine::exeMOVRR() {
   RegIndexType dest, src;
@@ -195,32 +352,199 @@ void VirtualMachine::exeADDMI() {
   this->incPC<AddrIndexType, ImmeType>();
 }
 
-void VirtualMachine::exeSUBRR() { std::cout << "exeSUBRR" << std::endl; }
-void VirtualMachine::exeSUBRM() { std::cout << "exeSUBRM" << std::endl; }
-void VirtualMachine::exeSUBRI() { std::cout << "exeSUBRI" << std::endl; }
-void VirtualMachine::exeSUBMR() { std::cout << "exeSUBMR" << std::endl; }
-void VirtualMachine::exeSUBMI() { std::cout << "exeSUBMI" << std::endl; }
+void VirtualMachine::exeSUBRR() {
+  RegIndexType dest, src;
+  this->convert2(dest, src);
+  this->registers[dest] -= this->registers[src];
+  this->incPC<RegIndexType, RegIndexType>();
+}
 
-void VirtualMachine::exeMULRR() { std::cout << "exeMULRR" << std::endl; }
-void VirtualMachine::exeMULRM() { std::cout << "exeMULRM" << std::endl; }
-void VirtualMachine::exeMULRI() { std::cout << "exeMULRI" << std::endl; }
-void VirtualMachine::exeMULMR() { std::cout << "exeMULMR" << std::endl; }
-void VirtualMachine::exeMULMI() { std::cout << "exeMULMI" << std::endl; }
+void VirtualMachine::exeSUBRM() {
+  RegIndexType dest;
+  AddrIndexType src;
+  this->convert2(dest, src);
+  this->registers[dest] -= this->memory[src];
+  this->incPC<RegIndexType, AddrIndexType>();
+}
 
-void VirtualMachine::exeDIVRR() { std::cout << "exeDIVRR" << std::endl; }
-void VirtualMachine::exeDIVRM() { std::cout << "exeDIVRM" << std::endl; }
-void VirtualMachine::exeDIVRI() { std::cout << "exeDIVRI" << std::endl; }
-void VirtualMachine::exeDIVMR() { std::cout << "exeDIVMR" << std::endl; }
-void VirtualMachine::exeDIVMI() { std::cout << "exeDIVMI" << std::endl; }
+void VirtualMachine::exeSUBRI() {
+  RegIndexType dest;
+  ImmeType src;
+  this->convert2(dest, src);
+  this->registers[dest] -= src;
+  this->incPC<RegIndexType, ImmeType>();
+}
 
-void VirtualMachine::exeMODRR() { std::cout << "exeMODRR" << std::endl; }
-void VirtualMachine::exeMODRM() { std::cout << "exeMODRM" << std::endl; }
-void VirtualMachine::exeMODRI() { std::cout << "exeMODRI" << std::endl; }
-void VirtualMachine::exeMODMR() { std::cout << "exeMODMR" << std::endl; }
-void VirtualMachine::exeMODMI() { std::cout << "exeMODMI" << std::endl; }
+void VirtualMachine::exeSUBMR() {
+  AddrIndexType dest;
+  RegIndexType src;
+  this->convert2(dest, src);
+  this->memory[dest] -= this->registers[src];
+  this->incPC<AddrIndexType, RegIndexType>();
+}
 
-void VirtualMachine::exeCMPRR() { std::cout << "exeCMPRR" << std::endl; }
-void VirtualMachine::exeCMPRM() { std::cout << "exeCMPRM" << std::endl; }
-void VirtualMachine::exeCMPRI() { std::cout << "exeCMPRI" << std::endl; }
-void VirtualMachine::exeCMPMR() { std::cout << "exeCMPMR" << std::endl; }
-void VirtualMachine::exeCMPMI() { std::cout << "exeCMPMI" << std::endl; }
+void VirtualMachine::exeSUBMI() {
+  AddrIndexType dest;
+  ImmeType src;
+  this->convert2(dest, src);
+  this->registers[dest] -= src;
+  this->incPC<AddrIndexType, ImmeType>();
+}
+
+void VirtualMachine::exeMULRR() {
+  RegIndexType dest, src;
+  this->convert2(dest, src);
+  this->registers[dest] *= this->registers[src];
+  this->incPC<RegIndexType, RegIndexType>();
+}
+
+void VirtualMachine::exeMULRM() {
+  RegIndexType dest;
+  AddrIndexType src;
+  this->convert2(dest, src);
+  this->registers[dest] *= this->memory[src];
+  this->incPC<RegIndexType, AddrIndexType>();
+}
+
+void VirtualMachine::exeMULRI() {
+  RegIndexType dest;
+  ImmeType src;
+  this->convert2(dest, src);
+  this->registers[dest] *= src;
+  this->incPC<RegIndexType, ImmeType>();
+}
+
+void VirtualMachine::exeMULMR() {
+  AddrIndexType dest;
+  RegIndexType src;
+  this->convert2(dest, src);
+  this->memory[dest] *= this->registers[src];
+  this->incPC<AddrIndexType, RegIndexType>();
+}
+
+void VirtualMachine::exeMULMI() {
+  AddrIndexType dest;
+  ImmeType src;
+  this->convert2(dest, src);
+  this->registers[dest] *= src;
+  this->incPC<AddrIndexType, ImmeType>();
+}
+
+// divide zero !
+void VirtualMachine::exeDIVRR() {
+  RegIndexType dest, src;
+  this->convert2(dest, src);
+  this->registers[dest] /= this->registers[src];
+  this->incPC<RegIndexType, RegIndexType>();
+}
+
+void VirtualMachine::exeDIVRM() {
+  RegIndexType dest;
+  AddrIndexType src;
+  this->convert2(dest, src);
+  this->registers[dest] /= this->memory[src];
+  this->incPC<RegIndexType, AddrIndexType>();
+}
+
+void VirtualMachine::exeDIVRI() {
+  RegIndexType dest;
+  ImmeType src;
+  this->convert2(dest, src);
+  this->registers[dest] /= src;
+  this->incPC<RegIndexType, ImmeType>();
+}
+
+void VirtualMachine::exeDIVMR() {
+  AddrIndexType dest;
+  RegIndexType src;
+  this->convert2(dest, src);
+  this->memory[dest] /= this->registers[src];
+  this->incPC<AddrIndexType, RegIndexType>();
+}
+
+void VirtualMachine::exeDIVMI() {
+  AddrIndexType dest;
+  ImmeType src;
+  this->convert2(dest, src);
+  this->registers[dest] /= src;
+  this->incPC<AddrIndexType, ImmeType>();
+}
+
+void VirtualMachine::exeMODRR() {
+  RegIndexType dest, src;
+  this->convert2(dest, src);
+  this->registers[dest] %= this->registers[src];
+  this->incPC<RegIndexType, RegIndexType>();
+}
+
+void VirtualMachine::exeMODRM() {
+  RegIndexType dest;
+  AddrIndexType src;
+  this->convert2(dest, src);
+  this->registers[dest] %= this->memory[src];
+  this->incPC<RegIndexType, AddrIndexType>();
+}
+
+void VirtualMachine::exeMODRI() {
+  RegIndexType dest;
+  ImmeType src;
+  this->convert2(dest, src);
+  this->registers[dest] %= src;
+  this->incPC<RegIndexType, ImmeType>();
+}
+
+void VirtualMachine::exeMODMR() {
+  AddrIndexType dest;
+  RegIndexType src;
+  this->convert2(dest, src);
+  this->memory[dest] %= this->registers[src];
+  this->incPC<AddrIndexType, RegIndexType>();
+}
+
+void VirtualMachine::exeMODMI() {
+  AddrIndexType dest;
+  ImmeType src;
+  this->convert2(dest, src);
+  this->registers[dest] %= src;
+  this->incPC<AddrIndexType, ImmeType>();
+}
+
+// some may not work
+void VirtualMachine::exeCMPRR() {
+  RegIndexType dest, src;
+  this->convert2(dest, src);
+  *this->ex = this->registers[dest] - this->registers[src];
+  this->incPC<RegIndexType, RegIndexType>();
+}
+
+void VirtualMachine::exeCMPRM() {
+  RegIndexType dest;
+  AddrIndexType src;
+  this->convert2(dest, src);
+  *this->ex = this->registers[dest] - this->memory[src];
+  this->incPC<RegIndexType, AddrIndexType>();
+}
+
+void VirtualMachine::exeCMPRI() {
+  RegIndexType dest;
+  ImmeType src;
+  this->convert2(dest, src);
+  *this->ex = this->registers[dest] - src;
+  this->incPC<RegIndexType, ImmeType>();
+}
+
+void VirtualMachine::exeCMPMR() {
+  AddrIndexType dest;
+  RegIndexType src;
+  this->convert2(dest, src);
+  *this->ex = this->memory[dest] - this->registers[src];
+  this->incPC<AddrIndexType, RegIndexType>();
+}
+
+void VirtualMachine::exeCMPMI() {
+  AddrIndexType dest;
+  ImmeType src;
+  this->convert2(dest, src);
+  *this->ex = this->registers[dest] - src;
+  this->incPC<AddrIndexType, ImmeType>();
+}
