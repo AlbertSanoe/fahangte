@@ -32,34 +32,72 @@ void VirtualMachine::convert2(DataType1 &val1, DataType2 &val2) {
   this->convert<DataType2>(val2, VirtualMachine::Pace<DataType1>::pace);
 }
 
-template <typename... DataTypes> void VirtualMachine::movePC() {
+template <typename... DataTypes> void VirtualMachine::incPC() {
   // static assert
   std::size_t totalPace = (Pace<DataTypes>::pace + ... + 1);
-  this->PC += totalPace;
+  *this->PC += totalPace;
+}
+
+void VirtualMachine::movePC(std::size_t addr) {
+  // static assert
+  *this->PC = addr;
 }
 
 void VirtualMachine::exeHALT() { std::cout << "exeHALT" << std::endl; }
 void VirtualMachine::exeNOP() { std::cout << "exeNOP" << std::endl; }
 
 void VirtualMachine::exeSTDINR() {
-  RegIndexType dest;
-  this->convert(dest);
-  std::cin >> this->registers[dest];
-  this->movePC<RegIndexType>();
+  RegIndexType input;
+  this->convert(input);
+  std::cin >> this->registers[input];
+  this->incPC<RegIndexType>();
 }
 
-void VirtualMachine::exeSTDINM() { 
-  AddrIndexType dest;
-  this->convert(dest);
-  std::cin >> this->memory[dest];
-  this->movePC<AddrIndexType>();
- }
-void VirtualMachine::exeSTDOUTR() { std::cout << "exeSTDOUTR" << std::endl; }
-void VirtualMachine::exeSTDOUTM() { std::cout << "exeSTDOUTM" << std::endl; }
-void VirtualMachine::exeSTDOUTI() { std::cout << "exeSTDOUTI" << std::endl; }
-void VirtualMachine::exeJMPR() { std::cout << "exeJMPR" << std::endl; }
-void VirtualMachine::exeJMPM() { std::cout << "exeJMPM" << std::endl; }
-void VirtualMachine::exeJMPI() { std::cout << "exeJMPI" << std::endl; }
+void VirtualMachine::exeSTDINM() {
+  AddrIndexType input;
+  this->convert(input);
+  std::cin >> this->memory[input];
+  this->incPC<AddrIndexType>();
+}
+
+void VirtualMachine::exeSTDOUTR() {
+  RegIndexType output;
+  this->convert(output);
+  std::cout << this->registers[output] << std::endl;
+  this->incPC<RegIndexType>();
+}
+
+void VirtualMachine::exeSTDOUTM() {
+  AddrIndexType output;
+  this->convert(output);
+  std::cout << this->memory[output] << std::endl;
+  this->incPC<AddrIndexType>();
+}
+
+void VirtualMachine::exeSTDOUTI() {
+  ImmeType output;
+  this->convert(output);
+  std::cout << output << std::endl;
+  this->incPC<ImmeType>();
+}
+
+void VirtualMachine::exeJMPR() {
+  RegIndexType jmp_addr;
+  this->convert(jmp_addr);
+  this->movePC(jmp_addr);
+}
+void VirtualMachine::exeJMPM() {
+  AddrIndexType jmp_addr;
+  this->convert(jmp_addr);
+  this->movePC(jmp_addr);
+}
+
+void VirtualMachine::exeJMPI() {
+  ImmeType jmp_addr;
+  this->convert(jmp_addr);
+  this->movePC(jmp_addr);
+}
+
 void VirtualMachine::exeJER() { std::cout << "exeJER" << std::endl; }
 void VirtualMachine::exeJEM() { std::cout << "exeJEM" << std::endl; }
 void VirtualMachine::exeJEI() { std::cout << "exeJEI" << std::endl; }
@@ -83,7 +121,7 @@ void VirtualMachine::exeMOVRR() {
   RegIndexType dest, src;
   this->convert2(dest, src);
   this->registers[dest] = this->registers[src];
-  this->movePC<RegIndexType, RegIndexType>();
+  this->incPC<RegIndexType, RegIndexType>();
 }
 
 void VirtualMachine::exeMOVRM() {
@@ -91,7 +129,7 @@ void VirtualMachine::exeMOVRM() {
   AddrIndexType src;
   this->convert2(dest, src);
   this->registers[dest] = this->memory[src];
-  this->movePC<RegIndexType, AddrIndexType>();
+  this->incPC<RegIndexType, AddrIndexType>();
 }
 
 void VirtualMachine::exeMOVRI() {
@@ -99,7 +137,7 @@ void VirtualMachine::exeMOVRI() {
   ImmeType src;
   this->convert2(dest, src);
   this->registers[dest] = src;
-  this->movePC<RegIndexType, ImmeType>();
+  this->incPC<RegIndexType, ImmeType>();
 }
 
 void VirtualMachine::exeMOVMR() {
@@ -107,7 +145,7 @@ void VirtualMachine::exeMOVMR() {
   RegIndexType src;
   this->convert2(dest, src);
   this->memory[dest] = this->registers[src];
-  this->movePC<AddrIndexType, RegIndexType>();
+  this->incPC<AddrIndexType, RegIndexType>();
 }
 
 void VirtualMachine::exeMOVMI() {
@@ -115,14 +153,14 @@ void VirtualMachine::exeMOVMI() {
   ImmeType src;
   this->convert2(dest, src);
   this->registers[dest] = src;
-  this->movePC<AddrIndexType, ImmeType>();
+  this->incPC<AddrIndexType, ImmeType>();
 }
 
 void VirtualMachine::exeADDRR() {
   RegIndexType dest, src;
   this->convert2(dest, src);
   this->registers[dest] += this->registers[src];
-  this->movePC<RegIndexType, RegIndexType>();
+  this->incPC<RegIndexType, RegIndexType>();
 }
 
 void VirtualMachine::exeADDRM() {
@@ -130,7 +168,7 @@ void VirtualMachine::exeADDRM() {
   AddrIndexType src;
   this->convert2(dest, src);
   this->registers[dest] += this->memory[src];
-  this->movePC<RegIndexType, AddrIndexType>();
+  this->incPC<RegIndexType, AddrIndexType>();
 }
 
 void VirtualMachine::exeADDRI() {
@@ -138,7 +176,7 @@ void VirtualMachine::exeADDRI() {
   ImmeType src;
   this->convert2(dest, src);
   this->registers[dest] += src;
-  this->movePC<RegIndexType, ImmeType>();
+  this->incPC<RegIndexType, ImmeType>();
 }
 
 void VirtualMachine::exeADDMR() {
@@ -146,7 +184,7 @@ void VirtualMachine::exeADDMR() {
   RegIndexType src;
   this->convert2(dest, src);
   this->memory[dest] += this->registers[src];
-  this->movePC<AddrIndexType, RegIndexType>();
+  this->incPC<AddrIndexType, RegIndexType>();
 }
 
 void VirtualMachine::exeADDMI() {
@@ -154,7 +192,7 @@ void VirtualMachine::exeADDMI() {
   ImmeType src;
   this->convert2(dest, src);
   this->registers[dest] += src;
-  this->movePC<AddrIndexType, ImmeType>();
+  this->incPC<AddrIndexType, ImmeType>();
 }
 
 void VirtualMachine::exeSUBRR() { std::cout << "exeSUBRR" << std::endl; }

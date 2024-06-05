@@ -249,8 +249,8 @@ public:
   template <typename DataType1, typename DataType2>
   void convert2(DataType1 &val1, DataType2 &val2);
 
-  template <typename ...DataTypes> void movePC();
-
+  template <typename... DataTypes> void incPC();
+  void movePC(std::size_t addr);
   // Template specialization for different types
   template <typename ConvertType> struct Pace;
 
