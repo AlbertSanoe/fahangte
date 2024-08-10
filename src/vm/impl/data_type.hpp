@@ -5,6 +5,10 @@ using ImmeType = uint32_t;
 using AddrIndexType = uint16_t;
 using RegIndexType = uint8_t;
 
+static const std::size_t instruction_addr_space = 1 << 16;
+static const std::size_t memory_addr_space = 1 << 16;
+static const std::size_t register_number = 8;
+
 enum class Param0 : uint8_t {
   nop = 0,
   halt = 1,

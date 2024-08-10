@@ -9,9 +9,7 @@ template <Impl::Param2 T2, Impl::OperandLabel Dest, Impl::OperandLabel Src>
 class Type2 : public BaseCode {
 
 public:
-  void handle() override{
-    Type2Handler<T2, Dest, Src>::handle(this);
-  }
+  void handle() override { Type2Handler<T2, Dest, Src>::handle(this); }
   Type2(typename Impl::OperandType<Dest>::type dest,
         typename Impl::OperandType<Src>::type src)
       : dest(dest), src(src) {}

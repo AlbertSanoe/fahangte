@@ -7,10 +7,6 @@
 
 namespace Impl {
 
-static const std::size_t instruction_addr_space = 1 << 16;
-static const std::size_t memory_addr_space = 1 << 16;
-static const std::size_t register_number = 8;
-
 template <
     OperandLabel label,
     typename = std::enable_if_t<std::disjunction_v<

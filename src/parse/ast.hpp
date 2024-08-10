@@ -2,13 +2,10 @@
 
 namespace Parse {
 
-enum class ExprKind {
-  OpK,
-  ConstK,
-  IdK,
-};
+enum class ExprRetType { Unevaluated, Integer };
 
-class TreeNode {
-    
+class Node {
+private:
+  ExprRetType ret_type;
 };
 } // namespace Parse
