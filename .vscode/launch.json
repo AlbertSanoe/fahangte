@@ -12,7 +12,6 @@
             "cwd": "",
             "stopAtEntry": false,
             "terminal": "integrated",
-            "initCommands":["settings set target.disable-aslr false"]
         }
     ]
 }

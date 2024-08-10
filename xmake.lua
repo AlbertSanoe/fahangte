@@ -10,26 +10,40 @@ set_languages("c++17")
 toolchain("clang4fahangte")
     set_toolset("cxx", "clang++")
     set_toolset("ld", "clang++")
-    add_includedirs("include")
 toolchain_end()
-header_dir="$(projectdir)/include/fahangte/"
-src_dir="$(projectdir)/src/"
+
+src_dir = "$(projectdir)/src/"
+vm_dir = src_dir .. "vm/"
+code_dir = vm_dir .. "code/"
+impl_dir = vm_dir .. "impl/"
 
 target("fat")
     set_kind("binary")
-    set_filename(abbr_name.."v"..version)
-    add_deps("main","vm")
+    set_filename(abbr_name .. "v" .. version)
+    add_deps("main", "vm")
 target_end()
 
 target("main")
     set_kind("object")
-    add_files(src_dir.."main.cpp")
+    add_files(src_dir .. "main.cpp")
+    add_deps("vm")
 target_end()
 
 target("vm")
+    set_kind("static")
+    add_deps("vm-code", "vm-impl")
+target_end()
+
+target("vm-code")
     set_kind("object")
-    add_headerfiles(header_dir.."vm.hpp")
-    add_files(src_dir.."vm.cpp")
+    add_headerfiles(code_dir .. "*.hpp")
+target_end()
+
+target("vm-impl")
+    set_kind("object")
+    add_files(impl_dir .. "*.cpp")
+    add_headerfiles(impl_dir .. "*.hpp")
+    add_deps("vm-code")
 target_end()
 
 -- target("file")
