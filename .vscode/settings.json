@@ -1,5 +1,8 @@
 {
     "xmake.additionalConfigArguments": [
         "--toolchain=clang4fahangte"
+    ],
+    "clangd.fallbackFlags": [
+        "-std=c++17"
     ]
 }

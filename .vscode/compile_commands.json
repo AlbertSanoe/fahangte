@@ -3,9 +3,4 @@
   "directory": "/home/ubuntu/Documents/fahangte",
   "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-o", "build/.objs/main/linux/x86_64/debug/src/main.cpp.o", "src/main.cpp"],
   "file": "src/main.cpp"
-},
-{
-  "directory": "/home/ubuntu/Documents/fahangte",
-  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-o", "build/.objs/vm-impl/linux/x86_64/debug/src/vm/impl/label.cpp.o", "src/vm/impl/label.cpp"],
-  "file": "src/vm/impl/label.cpp"
 }]
