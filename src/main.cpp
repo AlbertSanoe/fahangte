@@ -45,3 +45,12 @@
 //   return 0;
 // }
 
+#include "parse/lex/lexer.hpp"
+#include "parse/type.hpp"
+#include <iostream>
+int main() {
+  using namespace Lex;
+  const char *add = "+";
+  auto x=Token::createOperator<OperatorType::BinaryPlus>(add);
+  std::cout<<int(x.getOperatorInfo().getOperatorType())<<std::endl;
+}

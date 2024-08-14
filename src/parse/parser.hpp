@@ -1,21 +1,26 @@
 #pragma once
-#include "../lex/lexer.hpp"
+#include "lex/lexer.hpp"
 #include "ast/base.hpp"
 namespace Parse {
 
-using namespace Ast;
+
 
 class Parser {
-    using AstType= Expr;
+  using AstType = Ast::Expr;
+
 public:
   AstType parse();
 
 private:
-    Lex::Lexer lexer;
+  Lex::Lexer lexer;
 
 private:
-    Expr parseExpr(int rbp=0);
-    Expr parseBinary();
-    Expr parseIntegerConstant();
+  Ast::Expr parseExpr(
+      Lex::OperatorInfo info = std::move(Lex::OperatorInfo::createDefault()));
+  Ast::Expr parseBinary(Ast::Expr left,Lex::OperatorInfo info);
+  Ast::Expr parseIntegerConstant();
+
+private:
+
 };
 } // namespace Parse

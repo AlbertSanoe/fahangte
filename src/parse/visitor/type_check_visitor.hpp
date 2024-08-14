@@ -2,20 +2,19 @@
 #include "base_visitor.hpp"
 #include <assert.h>
 namespace Parse {
-using namespace Ast;
 class TypeCheckVisitor final : public AstVisitorBase {
 public:
-  void visit(BinaryArithOp &ba) override {
+  void visit(Ast::BinaryArithOp &ba) override {
     ExprRetType lhs_type = visitExpr(ba.getLHS());
     ExprRetType rhs_type = visitExpr(ba.getRHS());
     ba.setRetType(InferType(lhs_type, rhs_type));
   }
-  void visit(IntegerConstant &i) override {
+  void visit(Ast::IntegerConstant &i) override {
     assert(i.getRetType() == ExprRetType::Integer);
   }
 
 private:
-  ExprRetType visitExpr(const Expr &expr) {
+  ExprRetType visitExpr(const Ast::Expr &expr) {
     expr.accept(*this);
     return expr.getRetType();
   }

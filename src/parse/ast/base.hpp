@@ -1,17 +1,13 @@
 #pragma once
+#include "../type.hpp"
 #include <memory>
 #include <type_traits>
-
 namespace Parse {
 class AstVisitorBase;
 }
 
 namespace Ast {
-enum class ExprRetType {
-  Unevaluated,
-  Error,
-  Integer,
-};
+using namespace Parse;
 
 class ExprNode {
 public:

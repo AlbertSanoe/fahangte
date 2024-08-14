@@ -41,7 +41,7 @@ target_end()
 
 target("vm-impl")
     set_kind("object")
-    add_files(impl_dir .. "*.cpp")
+    --add_files(impl_dir .. "*.cpp")
     add_headerfiles(impl_dir .. "*.hpp")
     add_deps("vm-code")
 target_end()

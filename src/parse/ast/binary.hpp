@@ -4,8 +4,6 @@
 #include "base.hpp"
 namespace Ast {
 
-enum class ArithmeticOpKind { Plus, Minus, Multiply, Divide };
-
 template <typename OpKind> class BinaryOperator : public ExprNode {
 public:
   BinaryOperator(OpKind op, Expr left, Expr right)
@@ -22,9 +20,9 @@ private:
   Expr _right;
 };
 
-class BinaryArithOp final : public BinaryOperator<ArithmeticOpKind> {
+class BinaryArithOp final : public BinaryOperator<OperatorType> {
 public:
-  using BinaryOperator<ArithmeticOpKind>::BinaryOperator;
+  using BinaryOperator<OperatorType>::BinaryOperator;
   void accept(Parse::AstVisitorBase &visitor) override {
     return visitor.visit(*this);
   }
