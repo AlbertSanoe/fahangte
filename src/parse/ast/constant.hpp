@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../visitor/base_visitor.hpp"
 #include "base.hpp"
 namespace Ast {
 

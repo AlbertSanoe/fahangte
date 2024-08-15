@@ -1,4 +1,5 @@
 #pragma once
+#include "../../common/log.hpp"
 #include "../type.hpp"
 #include <assert.h>
 #include <string_view>
@@ -21,11 +22,14 @@ public:
     };
   }
 
-  static constexpr bool greaterBindingPower(OperatorInfo lhs,
-                                            OperatorInfo rhs) {
-    return (lhs._power == rhs._power) ? lhs._power > rhs._power
-           : (lhs._is_left_associativity && rhs._is_left_associativity) ? false
-                                                                        : true;
+  static bool greaterBindingPower(OperatorInfo lhs, OperatorInfo rhs) {
+    // DEBUG("lhs:{}, rhs:{}", int(lhs._power), int(rhs._power));
+    auto result = (lhs._power != rhs._power) ? lhs._power > rhs._power
+                  : (lhs._is_left_associativity && rhs._is_left_associativity)
+                      ? false
+                      : true;
+    // DEBUG("{}", result);
+    return result;
   }
   constexpr OperatorType getOperatorType() const { return _type; }
 
@@ -40,6 +44,8 @@ public:
   static Token createInteger(std::string_view lexeme, int value) {
     return {lexeme, value};
   }
+
+  static Token createEOF() { return {"", std::monostate{}}; }
 
   template <OperatorType op>
   static Token createOperator(std::string_view lexeme) {

@@ -1,5 +1,6 @@
 #pragma once
-#include "base_visitor.hpp"
+#include "../ast/binary.hpp"
+#include "../ast/constant.hpp"
 #include <assert.h>
 namespace Parse {
 class TypeCheckVisitor final : public AstVisitorBase {
@@ -20,11 +21,12 @@ private:
   }
 
   static ExprRetType InferType(ExprRetType lhs, ExprRetType rhs) {
-    if (lhs == rhs) {
-      return rhs;
-    } else {
-      return ExprRetType::Error;
-    }
+    return lhs == rhs ? rhs : ExprRetType::Error;
   }
 };
+
+inline void typeCheck(Ast::Expr &expr) {
+  TypeCheckVisitor visitor;
+  expr.accept(visitor);
+}
 } // namespace Parse

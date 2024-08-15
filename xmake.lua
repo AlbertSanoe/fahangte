@@ -10,9 +10,11 @@ set_languages("c++17")
 toolchain("clang4fahangte")
     set_toolset("cxx", "clang++")
     set_toolset("ld", "clang++")
+    add_includedirs("include")
 toolchain_end()
 
 src_dir = "$(projectdir)/src/"
+parse_dir = src_dir .. "parse/"
 vm_dir = src_dir .. "vm/"
 code_dir = vm_dir .. "code/"
 impl_dir = vm_dir .. "impl/"
@@ -20,7 +22,12 @@ impl_dir = vm_dir .. "impl/"
 target("fat")
     set_kind("binary")
     set_filename(abbr_name .. "v" .. version)
-    add_deps("main", "vm")
+    add_deps("main", "vm","parse")
+target_end()
+
+target("parse")
+    set_kind("object")
+    add_files(parse_dir.."parser.cpp")
 target_end()
 
 target("main")

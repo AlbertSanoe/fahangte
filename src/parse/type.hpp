@@ -1,5 +1,5 @@
 #pragma once
-
+#include <iostream>
 /* to link the type of token and ast */
 namespace Parse {
 enum class TokenType {
@@ -17,6 +17,54 @@ enum class OperatorType {
   BinaryMultiply,
   BinaryDivide,
 };
+
+inline std::ostream &operator<<(std::ostream &os, TokenType type) {
+  switch (type) {
+  case TokenType::Eof:
+    os << "EOF";
+    break;
+  case TokenType::Integer:
+    os << "Integer";
+    break;
+  case TokenType::Operator:
+    os << "Operator";
+    break;
+  default:
+    os << "Unknown";
+    break;
+  }
+  return os;
+}
+
+inline std::ostream &operator<<(std::ostream &os, OperatorType op) {
+  switch (op) {
+  case OperatorType::Default:
+    os << "Default";
+    break;
+  case OperatorType::UnaryPlus:
+    os << "UnaryPlus";
+    break;
+  case OperatorType::UnaryMinus:
+    os << "UnaryMinus";
+    break;
+  case OperatorType::BinaryPlus:
+    os << "BinaryPlus";
+    break;
+  case OperatorType::BinaryMinus:
+    os << "BinaryMinus";
+    break;
+  case OperatorType::BinaryMultiply:
+    os << "BinaryMultiply";
+    break;
+  case OperatorType::BinaryDivide:
+    os << "BinaryDivide";
+    break;
+  default:
+    os << "Unknown";
+    break;
+  }
+  return os;
+}
 
 enum class OperatorBindingPower {
   Default = 0,

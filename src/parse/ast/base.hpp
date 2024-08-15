@@ -2,6 +2,7 @@
 #include "../type.hpp"
 #include <memory>
 #include <type_traits>
+
 namespace Parse {
 class AstVisitorBase;
 }
@@ -42,3 +43,11 @@ private:
 class BinaryArithOp;
 class IntegerConstant;
 } // namespace Ast
+
+namespace Parse {
+class AstVisitorBase {
+public:
+  virtual void visit(Ast::BinaryArithOp &) = 0;
+  virtual void visit(Ast::IntegerConstant &) = 0;
+};
+} // namespace Parse

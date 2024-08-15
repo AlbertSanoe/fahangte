@@ -1,6 +1,11 @@
 [
 {
   "directory": "/home/ubuntu/Documents/fahangte",
-  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-o", "build/.objs/main/linux/x86_64/debug/src/main.cpp.o", "src/main.cpp"],
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-Iinclude", "-o", "build/.objs/parse/linux/x86_64/debug/src/parse/parser.cpp.o", "src/parse/parser.cpp"],
+  "file": "src/parse/parser.cpp"
+},
+{
+  "directory": "/home/ubuntu/Documents/fahangte",
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-Iinclude", "-o", "build/.objs/main/linux/x86_64/debug/src/main.cpp.o", "src/main.cpp"],
   "file": "src/main.cpp"
 }]
