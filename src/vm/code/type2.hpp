@@ -7,11 +7,8 @@ struct Type2Handler {};
 
 template <Impl::Param2 T2, Impl::OperandLabel Dest, Impl::OperandLabel Src>
 class Type2 : public BaseCode {
-
 public:
-  void handle() override{
-    Type2Handler<T2, Dest, Src>::handle(this);
-  }
+  void handle() override { Type2Handler<T2, Dest, Src>::handle(this); }
   Type2(typename Impl::OperandType<Dest>::type dest,
         typename Impl::OperandType<Src>::type src)
       : dest(dest), src(src) {}
@@ -26,9 +23,9 @@ template <>
 struct Type2Handler<Impl::Param2::add, Impl::OperandLabel::Reg,
                     Impl::OperandLabel::Reg> {
   static void handle(Type2<Impl::Param2::add, Impl::OperandLabel::Reg,
-                           Impl::OperandLabel::Reg> *code) {
-    Impl::implADD<Impl::OperandLabel::Reg, Impl::OperandLabel::Reg>(code->dest,
-                                                                    code->src);
+                           Impl::OperandLabel::Reg> const &code) {
+    Impl::implADD<Impl::OperandLabel::Reg, Impl::OperandLabel::Reg>(code.dest,
+                                                                    code.src);
   }
 };
 
