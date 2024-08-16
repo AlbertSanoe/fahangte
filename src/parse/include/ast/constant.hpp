@@ -1,6 +1,8 @@
 #pragma once
 
 #include "base.hpp"
+
+namespace Parse {
 namespace Ast {
 
 template <ExprRetType kind, typename RealType>
@@ -15,9 +17,8 @@ private:
 
 class IntegerConstant final : public Constant<ExprRetType::Integer, int> {
   using Constant<ExprRetType::Integer, int>::Constant;
-  void accept(Parse::AstVisitorBase &visitor) override {
-    return visitor.visit(*this);
-  }
+  void accept(Parse::AstVisitorBase &visitor);
 };
 
 } // namespace Ast
+} // namespace Parse

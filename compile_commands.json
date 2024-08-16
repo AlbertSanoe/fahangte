@@ -1,11 +1,41 @@
 [
 {
   "directory": "/home/ubuntu/Documents/fahangte",
-  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-Iinclude", "-o", "build/.objs/parse/linux/x86_64/debug/src/parse/parser.cpp.o", "src/parse/parser.cpp"],
-  "file": "src/parse/parser.cpp"
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-I/home/ubuntu/Documents/fahangte/src/lex/include", "-I/home/ubuntu/Documents/fahangte/src/include", "-o", "build/.objs/test_lex/linux/x86_64/debug/src/test/lex/main.cpp.o", "src/test/lex/main.cpp"],
+  "file": "src/test/lex/main.cpp"
 },
 {
   "directory": "/home/ubuntu/Documents/fahangte",
-  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-Iinclude", "-o", "build/.objs/main/linux/x86_64/debug/src/main.cpp.o", "src/main.cpp"],
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-I/home/ubuntu/Documents/fahangte/src/lex/include", "-I/home/ubuntu/Documents/fahangte/src/include", "-o", "build/.objs/test_lex/linux/x86_64/debug/src/test/lex/case1.cpp.o", "src/test/lex/case1.cpp"],
+  "file": "src/test/lex/case1.cpp"
+},
+{
+  "directory": "/home/ubuntu/Documents/fahangte",
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-I/home/ubuntu/Documents/fahangte/src/lex/include", "-I/home/ubuntu/Documents/fahangte/src/include", "-o", "build/.objs/lex/linux/x86_64/debug/src/lex/impl/lexer.cpp.o", "src/lex/impl/lexer.cpp"],
+  "file": "src/lex/impl/lexer.cpp"
+},
+{
+  "directory": "/home/ubuntu/Documents/fahangte",
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-I/home/ubuntu/Documents/fahangte/src/lex/include", "-I/home/ubuntu/Documents/fahangte/src/parse/include", "-I/home/ubuntu/Documents/fahangte/src/include", "-o", "build/.objs/parse/linux/x86_64/debug/src/parse/impl/ast/binary.cpp.o", "src/parse/impl/ast/binary.cpp"],
+  "file": "src/parse/impl/ast/binary.cpp"
+},
+{
+  "directory": "/home/ubuntu/Documents/fahangte",
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-I/home/ubuntu/Documents/fahangte/src/lex/include", "-I/home/ubuntu/Documents/fahangte/src/parse/include", "-I/home/ubuntu/Documents/fahangte/src/include", "-o", "build/.objs/parse/linux/x86_64/debug/src/parse/impl/ast/constant.cpp.o", "src/parse/impl/ast/constant.cpp"],
+  "file": "src/parse/impl/ast/constant.cpp"
+},
+{
+  "directory": "/home/ubuntu/Documents/fahangte",
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-I/home/ubuntu/Documents/fahangte/src/lex/include", "-I/home/ubuntu/Documents/fahangte/src/parse/include", "-I/home/ubuntu/Documents/fahangte/src/include", "-o", "build/.objs/parse/linux/x86_64/debug/src/parse/impl/parser.cpp.o", "src/parse/impl/parser.cpp"],
+  "file": "src/parse/impl/parser.cpp"
+},
+{
+  "directory": "/home/ubuntu/Documents/fahangte",
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-I/home/ubuntu/Documents/fahangte/src/lex/include", "-I/home/ubuntu/Documents/fahangte/src/parse/include", "-I/home/ubuntu/Documents/fahangte/src/include", "-o", "build/.objs/test_parse/linux/x86_64/debug/src/test/parse/main.cpp.o", "src/test/parse/main.cpp"],
+  "file": "src/test/parse/main.cpp"
+},
+{
+  "directory": "/home/ubuntu/Documents/fahangte",
+  "arguments": ["/usr/bin/clang++", "-c", "-Qunused-arguments", "-m64", "-g", "-O0", "-std=c++17", "-I/home/ubuntu/Documents/fahangte/src/include", "-o", "build/.objs/main/linux/x86_64/debug/src/main.cpp.o", "src/main.cpp"],
   "file": "src/main.cpp"
 }]

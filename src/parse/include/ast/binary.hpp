@@ -1,6 +1,7 @@
 #pragma once
 
 #include "base.hpp"
+namespace Parse {
 namespace Ast {
 
 template <typename OpKind> class BinaryOperator : public ExprNode {
@@ -19,12 +20,19 @@ private:
   Expr _right;
 };
 
-class BinaryArithOp final : public BinaryOperator<OperatorType> {
+enum class BinaryArithOpKind {
+  Plus,
+  Minus,
+  Multiply,
+  Divide,
+};
+
+class BinaryArithOp final : public BinaryOperator<BinaryArithOpKind> {
 public:
-  using BinaryOperator<OperatorType>::BinaryOperator;
-  void accept(Parse::AstVisitorBase &visitor) override {
-    return visitor.visit(*this);
-  }
+  using BinaryOperator<BinaryArithOpKind>::BinaryOperator;
+  void accept(Parse::AstVisitorBase &visitor);
 };
 
 } // namespace Ast
+
+} // namespace Parse

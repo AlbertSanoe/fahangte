@@ -1,7 +1,7 @@
 #pragma once
+
 #include <iostream>
-/* to link the type of token and ast */
-namespace Parse {
+namespace Lex {
 enum class TokenType {
   Eof,
   Integer,
@@ -16,6 +16,12 @@ enum class OperatorType {
   BinaryMinus,
   BinaryMultiply,
   BinaryDivide,
+};
+
+enum class OperatorBindingPower {
+  Default = 0,
+  BinaryPlusMinus = 10,
+  BinaryMultiplyDivide = 20,
 };
 
 inline std::ostream &operator<<(std::ostream &os, TokenType type) {
@@ -66,18 +72,6 @@ inline std::ostream &operator<<(std::ostream &os, OperatorType op) {
   return os;
 }
 
-enum class OperatorBindingPower {
-  Default = 0,
-  BinaryPlusMinus = 10,
-  BinaryMultiplyDivide = 20,
-};
-
-enum class ExprRetType {
-  Unevaluated,
-  Error,
-  Integer,
-};
-
 template <OperatorType type> struct OperatorTypeTransfer {};
 
 template <> struct OperatorTypeTransfer<OperatorType::BinaryPlus> {
@@ -99,5 +93,4 @@ template <> struct OperatorTypeTransfer<OperatorType::BinaryDivide> {
   static constexpr bool is_left_associativity = true;
   static constexpr auto power = OperatorBindingPower::BinaryMultiplyDivide;
 };
-
-} // namespace Parse
+} // namespace Lex

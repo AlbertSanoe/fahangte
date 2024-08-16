@@ -1,14 +1,17 @@
 #pragma once
-#include "../type.hpp"
 #include <memory>
 #include <type_traits>
 
 namespace Parse {
 class AstVisitorBase;
-}
 
 namespace Ast {
-using namespace Parse;
+
+enum class ExprRetType {
+  Unevaluated,
+  Error,
+  Integer,
+};
 
 class ExprNode {
 public:
@@ -40,14 +43,6 @@ private:
   Expr(std::shared_ptr<ExprNode> node) : _node{std::move(node)} {}
 };
 
-class BinaryArithOp;
-class IntegerConstant;
 } // namespace Ast
 
-namespace Parse {
-class AstVisitorBase {
-public:
-  virtual void visit(Ast::BinaryArithOp &) = 0;
-  virtual void visit(Ast::IntegerConstant &) = 0;
-};
 } // namespace Parse

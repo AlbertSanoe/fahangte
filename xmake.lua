@@ -1,33 +1,47 @@
 set_project("fahangte")
 set_version(version)
 set_xmakever("2.8.7")
-abbr_name="fat"
-version="0.0.1"
-add_rules("mode.debug","mode.release")
-add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
+abbr_name = "fat"
+version = "0.0.1"
+add_rules("mode.debug", "mode.release")
+add_rules("plugin.compile_commands.autoupdate", {
+    outputdir = "."
+})
 set_languages("c++17")
 
-toolchain("clang4fahangte")
-    set_toolset("cxx", "clang++")
-    set_toolset("ld", "clang++")
-    add_includedirs("include")
-toolchain_end()
-
 src_dir = "$(projectdir)/src/"
+include_dir = src_dir .. "include/"
+lex_dir= src_dir.."lex/"
 parse_dir = src_dir .. "parse/"
 vm_dir = src_dir .. "vm/"
 code_dir = vm_dir .. "code/"
 impl_dir = vm_dir .. "impl/"
 
+test_dir=src_dir.. "test/"
+
+toolchain("clang4fahangte")
+    set_toolset("cxx", "clang++")
+    set_toolset("ld", "clang++")
+    add_includedirs(include_dir)
+toolchain_end()
+
 target("fat")
     set_kind("binary")
     set_filename(abbr_name .. "v" .. version)
-    add_deps("main", "vm","parse")
+    add_deps("main", "lex","parse")
+target_end()
+
+target("lex")
+    set_kind("static")
+    add_includedirs(lex_dir .. "include/")
+    add_files(lex_dir.."**.cpp")
 target_end()
 
 target("parse")
-    set_kind("object")
-    add_files(parse_dir.."parser.cpp")
+    set_kind("static")
+    add_includedirs(lex_dir .. "include/")
+    add_includedirs(parse_dir .. "include/")
+    add_files(parse_dir .. "impl/**.cpp")
 target_end()
 
 target("main")
@@ -48,49 +62,27 @@ target_end()
 
 target("vm-impl")
     set_kind("object")
-    --add_files(impl_dir .. "*.cpp")
+-- add_files(impl_dir .. "*.cpp")
     add_headerfiles(impl_dir .. "*.hpp")
     add_deps("vm-code")
 target_end()
 
--- target("file")
---     set_kind("object")
---     add_files(file_dir.."**.cpp")
--- target_end()
+target("test_lex")
+    set_kind("binary")
+    add_includedirs(lex_dir .. "include/")
+    add_files(test_dir.."lex/**.cpp")
+    add_deps("lex")
+target_end()
 
--- target("lex")
---     set_kind("object")
---     add_files(lex_dir.."**.cpp")
--- target_end()
+target("test_parse")
+    set_kind("binary")
+    add_includedirs(lex_dir .. "include/")
+    add_includedirs(parse_dir .. "include/")
+    add_files(test_dir.."parse/**.cpp")
+    add_deps("parse","lex")
+target_end()
 
--- -- for testing
--- target("test_result")
---     set_kind("binary")
---     set_filename("result")
---     add_files(test_dir.."test_result.cpp")
--- target_end()
 
--- target("test_file")
---     set_kind("binary")
---     set_filename("file_reader")
---     add_files(test_dir.."test_filereader.cpp")
---     add_files(file_dir.."file.cpp")
---     set_runargs("/home/su/Documents/Code/fahangte/tmp/test.txt")
--- target_end()
-
--- target("test_lex")
---     set_kind("binary")
---     set_filename("lex")
---     add_files(test_dir.."test_lex.cpp")
---     add_deps("lex","file")
---     set_runargs("/home/su/Documents/Code/fahangte/tmp/test.txt")
--- target_end()
-
--- target("test_ast")
---     set_kind("binary")
---     set_filename("ast")
---     add_files(test_dir.."test_ast.cpp")
--- target_end()
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
 --

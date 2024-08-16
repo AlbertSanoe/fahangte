@@ -1,8 +1,8 @@
 #pragma once
-#include "../ast/binary.hpp"
-#include "../ast/constant.hpp"
+#include "base_visitor.hpp"
 #include <assert.h>
 namespace Parse {
+using namespace Ast;
 class TypeCheckVisitor final : public AstVisitorBase {
 public:
   void visit(Ast::BinaryArithOp &ba) override {

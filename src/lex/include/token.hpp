@@ -1,11 +1,10 @@
 #pragma once
-#include "../../common/log.hpp"
-#include "../type.hpp"
+
+#include "token_type.hpp"
 #include <assert.h>
 #include <string_view>
 #include <variant>
 namespace Lex {
-using namespace Parse;
 
 class OperatorInfo {
 public:
@@ -22,7 +21,8 @@ public:
     };
   }
 
-  static bool greaterBindingPower(OperatorInfo lhs, OperatorInfo rhs) {
+  static bool greaterBindingPower(OperatorInfo const &lhs,
+                                  OperatorInfo const &rhs) {
     // DEBUG("lhs:{}, rhs:{}", int(lhs._power), int(rhs._power));
     auto result = (lhs._power != rhs._power) ? lhs._power > rhs._power
                   : (lhs._is_left_associativity && rhs._is_left_associativity)
